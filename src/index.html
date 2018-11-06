@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html class="no-js">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Chaining Calculator</title>
+    <meta name="description" content="chain functions">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <section class="panel">
+      <div class="row">
+        <form>
+          <div class="area">
+            <input type="text" id="showValue" value="" disabled />
+          </div>
+          <div class="flex">
+            <div class="col-1">
+              <div class="buttons">
+                <input class="button" type="button" onclick="displayValue('+')" value="&#x2b;" />
+                <input class="button" type="button" onclick="displayValue('-')" value="&#x2212;" />
+                <input class="button" type="button" onclick="displayValue('*')" value="&#xd7;" />
+              </div>
+              <div class="buttons">
+                <input class="number button" type="button" onclick="displayValue(7)" value="7" />
+                <input class="number button" type="button" onclick="displayValue(8)" value="8" />
+                <input class="number button" type="button" onclick="displayValue(9)" value="9" />
+              </div>
+              <div class="buttons">
+                <input class="number button" type="button" onclick="displayValue(4)" value="4" />
+                <input class="number button" type="button" onclick="displayValue(5)" value="5" />
+                <input class="number button" type="button" onclick="displayValue(6)" value="6" />
+              </div>
+              <div class="buttons">
+                <input class="number button" type="button" onclick="displayValue(1)" value="1" />
+                <input class="number button" type="button" onclick="displayValue(2)" value="2" />
+                <input class="number button" type="button" onclick="displayValue(3)" value="3" />
+              </div>
+              <div class="buttons">
+                <input class="number button" type="button" onclick="displayValue(0)" value="0" />
+                <input class="number button" type="button" onclick="displayValue('.')" value="." />
+                <input class="reset button" type="button" onclick="resetValue()" value="AC" />
+              </div>
+            </div>
+            <div class="col-2">
+              <div class="buttons">
+                <input class="button" type="button" onclick="displayValue('/')" value="&#xf7;" />
+              </div>
+              <div class="buttons equal">
+                <input class="button" type="button" onclick="displayResult()" value="=" />
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </section>
+    <script type="text/javascript" src="./scripts/index.js"></script>
+    <script type="text/javascript">
+      var isCalculated = false;
+      // part 1
+      // basic functions for calculation
+      var addCalc = function(val1, val2) {
+        return parseFloat(val1) + parseFloat(val2);
+      }
+
+      var subtractCalc = function(val1, val2) {
+        return parseFloat(val1) - parseFloat(val2);
+      }
+
+      var multiplyCalc = function(val1, val2) {
+        return parseFloat(val1) * parseFloat(val2);
+      }
+
+      var divideCalc = function(val1, val2) {
+        return parseFloat(val1) / parseFloat(val2);
+      }
+
+      var resetCalc = function() {
+        return '';
+      }
+
+      var equalCalc = function(currentVal) {
+        return currentVal;
+      }
+
+      // chain function for chaining all calculations together
+      var Calc = function() {
+        this.value = 0;
+        
+        // add function
+        this.add = function(newValue) {
+          this.value = addCalc(this.value, newValue);
+          return this;
+        }
+
+        // subtract function
+        this.subtract = function(newValue) {
+          this.value = subtractCalc(this.value, newValue);
+          return this;
+        }
+
+        // multiply function
+        this.multiply = function(newValue) {
+          this.value = multiplyCalc(this.value, newValue);
+          return this;
+        }
+
+        // divide function
+        this.divide = function(newValue) {
+          this.value = divideCalc(this.value, newValue);
+          return this;
+        }
+
+        // reset function
+        this.reset = function() {
+          this.value = resetCalc();
+          return this;
+        }
+
+        // equals function
+        this.equals = function() {
+          this.value = equalCalc(this.value);
+          return this.value;
+        }
+      }
+
+      // Chaining function test demo
+      // var calc = new Calc();
+      // calc.add(6).add(5).subtract(1).multiply(2).divide(1).equals();
+
+      // part 2
+      // calculator function
+      var showValueNode = document.getElementById('showValue');
+
+      var displayValue = function(val) {
+        if(this.isCalculated === true && !isNaN(val)) {
+          this.isCalculated = false;
+          showValueNode.value = '';
+        }
+
+        if(this.isCalculated === true && isNaN(val)) {
+          this.isCalculated = false;
+          showValueNode.value = document.getElementById('showValue').value;
+        }
+
+        if(this.isCalculated === false) {
+          showValueNode.value += val;
+        }
+      }
+
+      var displayResult = function() {
+        var rawStr = showValueNode.value,
+            copyStr = rawStr;
+        rawStr = rawStr.replace(/[0-9]+/g, '#').replace(/[\(|\|\.)]/g, '');
+        
+        var getNumbers = copyStr.split(/[^0-9\.]+/),
+            operators = rawStr.split('#').filter(function(n){ 
+              return n 
+            }),
+            calcArray = [];
+
+        for(let i = 0; i < getNumbers.length; i++) {
+          calcArray.push(getNumbers[i]);
+          if (i < operators.length) calcArray.push(operators[i]);
+        }
+
+        if(calcArray.length <= 3) { // if input format is like value1 + or - or * or / value 2
+          switch(calcArray[1]) {
+            case '+':
+              this.isCalculated = true;
+              showValueNode.value = addCalc(calcArray[0], calcArray[2]); // using part 1 calc library add method
+              break;
+            case '-':
+              this.isCalculated = true;
+              showValueNode.value = subtractCalc(calcArray[0], calcArray[2]); // using part 1 calc library subtract method
+              break;
+            case '*':
+              this.isCalculated = true;
+              showValueNode.value = multiplyCalc(calcArray[0], calcArray[2]); // using part 1 calc library multiply method
+              break;
+            case '/':
+              this.isCalculated = true;
+              showValueNode.value = divideCalc(calcArray[0], calcArray[2]); // using part 1 calc library divide method
+              break;
+          }
+        }else {
+          this.isCalculated = true;
+          showValueNode.value = eval(calcArray.join(' ')); // handle the multiple values calculation methods, such as a * b + c / b
+        }
+      }
+
+      var resetValue = function() {
+        showValueNode.value = ''; // reset value to 0
+      }
+      // The only drawback I can think of is that I don't have enough time to handle is to reduce the scripts file size 
+      // TODO
+      // To seperate functions into different components, later smaller files will be imported by index.html file (Personal thoughts)
+    </script>
+  </body>
+</html>
