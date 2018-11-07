@@ -39,12 +39,18 @@
               <div class="buttons">
                 <input class="number button" type="button" onclick="displayValue(0)" value="0">
                 <input class="number button" type="button" onclick="displayValue('.')" value=".">
-                <input class="reset button" type="button" onclick="resetValue()" value="AC">
+                <input class="reset button" type="button" onclick="resetValue()" value="C">
               </div>
             </div>
             <div class="col-2">
               <div class="buttons">
                 <input class="button" type="button" onclick="displayValue('/')" value="&#xf7;">
+              </div>
+              <div class="buttons">
+                <input class="button" type="button" onclick="displayValue('(')" value="(">
+              </div>
+              <div class="buttons">
+                <input class="button" type="button" onclick="displayValue(')')" value=")">
               </div>
               <div class="buttons equal">
                 <input class="button" type="button" onclick="displayResult()" value="=">
@@ -131,18 +137,39 @@ var showValueNode = document.getElementById('showValue');
 
 var displayValue = function displayValue(val) {
   if (this.isCalculated === true && !isNaN(val)) {
+    // if user clicks numeric buttons, reset value to ''
     this.isCalculated = false;
     showValueNode.value = '';
   }
 
   if (this.isCalculated === true && isNaN(val)) {
+    // if user clicks non-numeric buttons, continue calculation process
     this.isCalculated = false;
     showValueNode.value = document.getElementById('showValue').value;
   }
 
   if (this.isCalculated === false) {
+    // normal process
     showValueNode.value += val;
   }
+};
+
+var countDecimals = function countDecimals(value) {
+  // count decinmal places
+  if (Math.floor(value) !== value) {
+    return value.toString().split(".")[1].length || 0;
+  }
+
+  return 0;
+};
+
+var decimalControl = function decimalControl(value) {
+  if (countDecimals(value) > 8) {
+    // fix decimal place value as 8 if calculated value beyonds 8 decimal places
+    return value.toFixed(8);
+  }
+
+  return value;
 };
 
 var displayResult = function displayResult() {
@@ -157,7 +184,10 @@ var displayResult = function displayResult() {
 
   for (var i = 0; i < getNumbers.length; i++) {
     calcArray.push(getNumbers[i]);
-    if (i < operators.length) calcArray.push(operators[i]);
+
+    if (i < operators.length) {
+      calcArray.push(operators[i]);
+    }
   }
 
   if (calcArray.length <= 3) {
@@ -165,38 +195,42 @@ var displayResult = function displayResult() {
     switch (calcArray[1]) {
       case '+':
         this.isCalculated = true;
-        showValueNode.value = addCalc(calcArray[0], calcArray[2]); // using part 1 calc library add method
+        showValueNode.value = decimalControl(addCalc(calcArray[0], calcArray[2])); // using part 1 calc library add method
 
         break;
 
       case '-':
         this.isCalculated = true;
-        showValueNode.value = subtractCalc(calcArray[0], calcArray[2]); // using part 1 calc library subtract method
+        showValueNode.value = decimalControl(subtractCalc(calcArray[0], calcArray[2])); // using part 1 calc library subtract method
 
         break;
 
       case '*':
         this.isCalculated = true;
-        showValueNode.value = multiplyCalc(calcArray[0], calcArray[2]); // using part 1 calc library multiply method
+        showValueNode.value = decimalControl(multiplyCalc(calcArray[0], calcArray[2])); // using part 1 calc library multiply method
 
         break;
 
       case '/':
         this.isCalculated = true;
-        showValueNode.value = divideCalc(calcArray[0], calcArray[2]); // using part 1 calc library divide method
+        showValueNode.value = decimalControl(divideCalc(calcArray[0], calcArray[2])); // using part 1 calc library divide method
 
         break;
     }
   } else {
     this.isCalculated = true;
-    showValueNode.value = eval(calcArray.join(' ')); // handle the multiple values calculation methods, such as a * b + c / b
+    showValueNode.value = decimalControl(eval(calcArray.join(' '))); // handle the multiple values calculation methods, such as a * b + c / b
   }
 };
 
 var resetValue = function resetValue() {
   showValueNode.value = ''; // reset value to 0
-}; // The only drawback I can think of is that I don't have enough time to handle is to reduce the scripts file size 
+}; // The drawbacks I can think of is that 
+// I don't have enough time to handle is to reduce the scripts file size 
+// Calculator still needs more time to complete all the features, not completed yet, just a prototype
 // TODO
-// To seperate functions into different components, later smaller files will be imported by index.html file (Personal thoughts)</script>
+// To seperate functions into different components, later smaller files will be imported by index.html file (Personal thoughts)
+// To make display more advanced (able to handle more than 11 characters calculation display)</script>
+    <!-- Total time spent for this task: 6.5 hours -->
   </body>
 </html>

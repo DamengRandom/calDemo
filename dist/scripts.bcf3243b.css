@@ -79,7 +79,7 @@ input:hover {
 
 .buttons.equal {
   display: flex;
-  height: 80%;
+  height: 40%;
 }
 
 .buttons.equal > .button {
